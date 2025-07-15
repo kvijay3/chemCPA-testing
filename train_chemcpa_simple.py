@@ -109,8 +109,8 @@ class SimplifiedChemCPATrainer:
                     'step_size_lr': 45,
                 },
                 'embedding': {
-                    'model': 'chemCPA',  # Use chemCPA embeddings for drug representation
-                    'datapath': 'embeddings/chemCPA/',
+                    'model': 'zeros',  # Use zero embeddings as fallback (will be learned during training)
+                    'datapath': None,
                 },
                 'additional_params': {
                     'seed': 42,
