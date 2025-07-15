@@ -48,11 +48,59 @@ def install_dependencies():
     print("✅ Dependencies installed!")
 
 
+def fix_project_folder():
+    """Fix broken project_folder symlink and create proper directory"""
+    print("🔧 Fixing project_folder...")
+    
+    project_folder = Path("project_folder")
+    
+    # Check if it's a broken symlink
+    if project_folder.is_symlink():
+        target = project_folder.readlink()
+        if not target.exists():
+            print(f"   ❌ Broken symlink to {target} - removing")
+            project_folder.unlink()
+        else:
+            print(f"   🔗 Valid symlink to {target}")
+            return True
+    
+    # Create local directory if needed
+    if not project_folder.exists():
+        project_folder.mkdir()
+        print("   📁 Created local project_folder")
+    
+    return True
+
+
 def create_directories():
-    """Create necessary directories, handling existing symlinks"""
+    """Create necessary directories"""
     print("🏗️  Creating directories...")
     
-    dirs_to_create = [
+    # Fix project_folder first
+    if not fix_project_folder():
+        print("❌ Failed to fix project_folder")
+        return False
+    
+    # Create subdirectories in project_folder
+    project_subdirs = [
+        "project_folder/datasets",
+        "project_folder/embeddings",
+        "project_folder/embeddings/rdkit",
+        "project_folder/embeddings/rdkit/data",
+        "project_folder/embeddings/rdkit/data/embeddings", 
+        "project_folder/embeddings/chemCPA",
+        "project_folder/binaries"
+    ]
+    
+    for subdir in project_subdirs:
+        try:
+            Path(subdir).mkdir(parents=True, exist_ok=True)
+            print(f"   📁 {subdir}")
+        except Exception as e:
+            print(f"   ⚠️  Could not create {subdir}: {e}")
+    
+    # Create other directories
+    other_dirs = [
         "outputs",
         "outputs/checkpoints", 
         "outputs/logs",
@@ -60,39 +108,15 @@ def create_directories():
         "logs"
     ]
     
-    # Handle project_folder specially (might be symlink)
-    project_folder = Path("project_folder")
-    if not project_folder.exists():
-        project_folder.mkdir()
-        print("   📁 project_folder")
-    elif project_folder.is_symlink() and project_folder.is_dir():
-        print("   🔗 project_folder (symlink exists)")
-    else:
-        print("   📁 project_folder (already exists)")
-    
-    # Create subdirectories in project_folder
-    subdirs = [
-        "project_folder/datasets",
-        "project_folder/embeddings",
-        "project_folder/binaries"
-    ]
-    
-    for subdir in subdirs:
-        try:
-            Path(subdir).mkdir(parents=True, exist_ok=True)
-            print(f"   📁 {subdir}")
-        except:
-            print(f"   ⚠️  Could not create {subdir}")
-    
-    # Create other directories
-    for directory in dirs_to_create:
+    for directory in other_dirs:
         try:
             Path(directory).mkdir(parents=True, exist_ok=True)
             print(f"   📁 {directory}")
-        except:
-            print(f"   ⚠️  Could not create {directory}")
+        except Exception as e:
+            print(f"   ⚠️  Could not create {directory}: {e}")
     
     print("✅ Directories created!")
+    return True
 
 
 def install_chemcpa():
@@ -127,7 +151,9 @@ def main():
     install_dependencies()
     
     # Create directories
-    create_directories()
+    if not create_directories():
+        print("❌ Directory creation failed")
+        return
     
     # Install ChemCPA
     install_chemcpa()
@@ -141,4 +167,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
