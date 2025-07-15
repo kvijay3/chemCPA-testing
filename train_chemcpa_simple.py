@@ -59,6 +59,11 @@ class SimplifiedChemCPATrainer:
                 'dataset_path': 'project_folder/datasets/lincs_full.h5ad',
                 'split_key': 'split_cellcycle_ood', 
                 'description': 'LINCS dataset - comprehensive drug screening'
+            },
+            'biolord': {
+                'dataset_path': 'project_folder/datasets/adata_biolord_split_30.h5ad',
+                'split_key': 'split_cellcycle_ood',
+                'description': 'Biolord dataset - high-quality biological data for stem cells'
             }
         }
         
@@ -296,7 +301,7 @@ def main():
     parser = argparse.ArgumentParser(description='Train ChemCPA for stem cell drug perturbation prediction')
     
     # Dataset arguments
-    parser.add_argument('--dataset', type=str, choices=['sciplex', 'broad', 'lincs'], 
+    parser.add_argument('--dataset', type=str, choices=['sciplex', 'broad', 'lincs', 'biolord'], 
                        default='sciplex', help='Dataset to use for training')
     
     # Training arguments
