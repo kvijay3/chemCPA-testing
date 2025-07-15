@@ -23,6 +23,7 @@ from typing import List, Dict, Optional
 
 # Add raw_data to path
 sys.path.append(str(Path(__file__).parent / 'raw_data'))
+sys.path.append(str(Path(__file__).parent))
 
 try:
     from raw_data.datasets import (
@@ -30,9 +31,26 @@ try:
         sciplex, norman, lincs_full, adata_biolord_split_30,
         trapnell_final_v7, sciplex_combinatorial, drugbank_all
     )
-except ImportError:
-    print("Error: Could not import dataset utilities. Make sure you're in the chemCPA-vijay directory.")
-    sys.exit(1)
+except ImportError as e:
+    print(f"Error: Could not import dataset utilities: {e}")
+    print("Make sure you're in the chemCPA directory and raw_data/ exists.")
+    print("Trying alternative import...")
+    try:
+        # Try direct import
+        import raw_data.datasets as datasets
+        DATASETS_INFO = datasets.DATASETS_INFO
+        ensure_dataset = datasets.ensure_dataset
+        list_available_datasets = datasets.list_available_datasets
+        sciplex = datasets.sciplex
+        norman = datasets.norman
+        lincs_full = datasets.lincs_full
+        adata_biolord_split_30 = datasets.adata_biolord_split_30
+        trapnell_final_v7 = datasets.trapnell_final_v7
+        sciplex_combinatorial = datasets.sciplex_combinatorial
+        drugbank_all = datasets.drugbank_all
+    except ImportError as e2:
+        print(f"Alternative import also failed: {e2}")
+        sys.exit(1)
 
 
 class ChemCPADatasetDownloader:
@@ -43,10 +61,25 @@ class ChemCPADatasetDownloader:
         self.datasets_folder = self.project_folder / "datasets"
         self.embeddings_folder = self.project_folder / "embeddings"
         
-        # Create directories
-        self.project_folder.mkdir(exist_ok=True)
-        self.datasets_folder.mkdir(exist_ok=True)
-        self.embeddings_folder.mkdir(exist_ok=True)
+        # Create directories, handling existing symlinks
+        self._ensure_directory(self.project_folder)
+        self._ensure_directory(self.datasets_folder)
+        self._ensure_directory(self.embeddings_folder)
+    
+    def _ensure_directory(self, path: Path):
+        """Ensure directory exists, handling symlinks properly"""
+        if path.exists():
+            if path.is_dir():
+                return  # Already exists as directory
+            elif path.is_symlink():
+                if path.is_dir():
+                    return  # Symlink to valid directory
+                else:
+                    # Broken symlink, remove it
+                    path.unlink()
+        
+        # Create directory
+        path.mkdir(parents=True, exist_ok=True)
         
         # Dataset groups for easy downloading
         self.dataset_groups = {
@@ -365,4 +398,3 @@ Examples:
 
 if __name__ == '__main__':
     main()
-
