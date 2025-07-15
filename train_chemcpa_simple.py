@@ -48,36 +48,54 @@ class SimplifiedChemCPATrainer:
             'sciplex': {
                 'dataset_path': 'project_folder/datasets/sciplex_complete_v2.h5ad',
                 'split_key': 'split_cellcycle_ood',
+                'perturbation_key': 'condition',
+                'pert_category': 'cov_drug_dose_name',
+                'dose_key': 'dose',
+                'smiles_key': 'SMILES',  # Sciplex has SMILES
+                'covariate_keys': 'cell_type',
                 'description': 'Sciplex dataset - good for initial testing'
             },
             'broad': {
                 'dataset_path': 'project_folder/datasets/adata_biolord_split_30_subset.h5ad', 
                 'split_key': 'split_cellcycle_ood',
+                'perturbation_key': 'condition',
+                'pert_category': 'cov_drug_dose_name',
+                'dose_key': 'dose',
+                'smiles_key': 'SMILES',  # Broad has SMILES
+                'covariate_keys': 'cell_type',
                 'description': 'Broad dataset - larger scale training'
             },
             'lincs': {
-                'dataset_path': 'project_folder/datasets/lincs_full.h5ad',
-                'split_key': 'split_cellcycle_ood', 
-                'description': 'LINCS dataset - comprehensive drug screening'
+                'dataset_path': 'project_folder/datasets/lincs.h5ad',
+                'split_key': 'split',
+                'perturbation_key': 'cov_drug_dose_name',
+                'pert_category': 'cov_drug_dose_name',
+                'dose_key': 'dose_val',
+                'smiles_key': None,  # LINCS doesn't have SMILES in obs
+                'covariate_keys': ['cell_type'],
+                'description': 'LINCS L1000 dataset - large drug screening'
             },
             'biolord': {
                 'dataset_path': 'project_folder/datasets/adata_biolord_split_30.h5ad',
                 'split_key': 'split_cellcycle_ood',
+                'perturbation_key': 'condition',
+                'pert_category': 'cov_drug_dose_name',
+                'dose_key': 'dose',
+                'smiles_key': 'SMILES',  # Biolord has SMILES
+                'covariate_keys': 'cell_type',
                 'description': 'Biolord dataset - high-quality biological data for stem cells'
             }
         }
         
+        # Get dataset-specific configuration
+        dataset_config = dataset_configs[self.args.dataset]
+        
         # Base configuration
         self.config = {
             'dataset': {
-                'perturbation_key': 'condition',
-                'pert_category': 'cov_drug_dose_name',
-                'dose_key': 'dose',
-                'covariate_keys': 'cell_type',
-                'smiles_key': 'SMILES',
                 'use_drugs_idx': True,
                 'degs_key': 'all_DEGs',
-                **dataset_configs[self.args.dataset]
+                **dataset_config
             },
             'model': {
                 'hparams': {
