@@ -124,13 +124,13 @@ def install_chemcpa():
     print("🔧 Installing ChemCPA package...")
     
     try:
-        subprocess.run([sys.executable, "setup.py", "install", "-e", "."], 
+        subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], 
                       check=True, capture_output=True)
         print("✅ ChemCPA package installed!")
         return True
     except subprocess.CalledProcessError:
         print("⚠️  ChemCPA package installation failed - you may need to run manually:")
-        print("   python setup.py install -e .")
+        print("   pip install -e .")
         return False
 
 

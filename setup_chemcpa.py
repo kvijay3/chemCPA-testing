@@ -216,14 +216,14 @@ class ChemCPASetup:
         
         try:
             subprocess.run([
-                sys.executable, "setup.py", "install", "-e", "."
+                sys.executable, "-m", "pip", "install", "-e", "."
             ], check=True, capture_output=True, text=True)
             print("✅ ChemCPA package installed!")
             return True
             
         except subprocess.CalledProcessError as e:
             print(f"❌ Error installing ChemCPA package: {e}")
-            print("You may need to install manually with: python setup.py install -e .")
+            print("You may need to install manually with: pip install -e .")
             return False
     
     def run_test_example(self):
