@@ -131,7 +131,9 @@ class SimplifiedChemCPATrainer:
         
         # Load dataset splits
         try:
-            datasets, dataset = load_dataset_splits(**self.config['dataset'], return_dataset=True)
+            # Remove description from config before passing to load_dataset_splits
+            dataset_config = {k: v for k, v in self.config['dataset'].items() if k != 'description'}
+            datasets, dataset = load_dataset_splits(**dataset_config, return_dataset=True)
             
             # Create data module
             dm = PerturbationDataModule(
@@ -343,4 +345,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
