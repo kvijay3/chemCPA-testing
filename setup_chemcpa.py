@@ -137,10 +137,32 @@ class ChemCPASetup:
         
         for directory in directories:
             dir_path = Path(directory)
-            dir_path.mkdir(parents=True, exist_ok=True)
-            print(f"   📁 {directory}")
+            
+            # Handle existing files/symlinks
+            if dir_path.exists():
+                if dir_path.is_dir():
+                    print(f"   📁 {directory} (already exists)")
+                    continue
+                elif dir_path.is_symlink():
+                    print(f"   🔗 {directory} (symlink exists)")
+                    # Create subdirectories if it's a symlink to a directory
+                    if dir_path.is_dir():
+                        continue
+                else:
+                    print(f"   ⚠️  {directory} exists but is not a directory")
+                    continue
+            
+            try:
+                dir_path.mkdir(parents=True, exist_ok=True)
+                print(f"   📁 {directory}")
+            except FileExistsError:
+                # Handle race condition or symlink issues
+                if dir_path.exists() and dir_path.is_dir():
+                    print(f"   📁 {directory} (created)")
+                else:
+                    print(f"   ⚠️  Could not create {directory}")
         
-        print("✅ Project structure created!")
+        print("✅ Project structure setup complete!")
     
     def download_essential_datasets(self, quick_mode=False):
         """Download essential datasets for stem cell work"""
@@ -331,4 +353,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
