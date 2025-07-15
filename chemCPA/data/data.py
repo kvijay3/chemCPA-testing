@@ -218,8 +218,12 @@ def load_data(
                 print(f"Loading data from {data_path}")
                 print(f"File structure: {list(file.keys())}")
 
-            # Prepare obs_keys for obs loader
-            obs_keys = [perturbation_key, dose_key, pert_category, smiles_key, 'control', split_key] + \
+            # Prepare obs_keys for obs loader - filter out None values
+            base_keys = [perturbation_key, dose_key, pert_category, 'control', split_key]
+            if smiles_key is not None:
+                base_keys.append(smiles_key)
+            
+            obs_keys = [key for key in base_keys if key is not None] + \
                       ([covariate_keys] if isinstance(covariate_keys, str) else (covariate_keys or []))
 
             # Define loader functions with descriptions
@@ -250,7 +254,7 @@ def load_data(
                 },
                 {
                     'name': 'Loading SMILES data',
-                    'condition': lambda: smiles_key is not None and 'obs' in file,
+                    'condition': lambda: smiles_key is not None and 'obs' in file and smiles_key in file['obs'],
                     'loader': lambda f: {'smiles': load_smiles(f['obs'], smiles_key, verbose)}
                 }
             ]
@@ -329,4 +333,3 @@ def load_dataset_splits(
         return splits, dataset
     else:
         return splits
-
