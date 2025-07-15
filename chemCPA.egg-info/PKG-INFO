@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: chemCPA
+Version: 1.0.0
+Home-page: http://github.com/theislab/chemCPA
+Author: See README.md
+Author-email: See paper
+License: MIT
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
