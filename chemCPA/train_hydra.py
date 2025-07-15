@@ -1,15 +1,15 @@
 from pathlib import Path
 import hydra
-import lightning as L
+import pytorch_lightning as L
 import torch
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
-from lightning.pytorch.loggers import WandbLogger
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.loggers import WandbLogger
 from omegaconf import OmegaConf
 import numpy as np
 
 from chemCPA.data.data import PerturbationDataModule, load_dataset_splits
 from chemCPA.paths import WB_DIR
-from lightning_module import ChemCPA  # your LightningModule containing ComPert usage
+from chemCPA.lightning_module import ChemCPA  # your LightningModule containing ComPert usage
 
 
 @hydra.main(version_base=None, config_path="../config/", config_name="main")
@@ -167,4 +167,3 @@ def main(args):
 
 if __name__ == "__main__":
     main()
-
