@@ -59,6 +59,18 @@ class SimplifiedChemCPATrainer:
                 'dataset_path': 'project_folder/datasets/lincs_full.h5ad',
                 'split_key': 'split_cellcycle_ood', 
                 'description': 'LINCS dataset - comprehensive drug screening'
+            },
+            'biolord': {
+                'dataset_path': 'project_folder/datasets/adata_biolord_split_30.h5ad',
+                'split_key': 'split',
+                'perturbation_key': 'condition',
+                'pert_category': 'condition',
+                'dose_key': 'dose',
+                'covariate_keys': 'cell_type',
+                'smiles_key': 'smiles',
+                'use_drugs_idx': True,
+                'degs_key': 'rank_genes_groups_cov_all',
+                'description': 'Biolord dataset - high-quality biological data for stem cells'
             }
         }
         
@@ -131,7 +143,9 @@ class SimplifiedChemCPATrainer:
         
         # Load dataset splits
         try:
-            datasets, dataset = load_dataset_splits(**self.config['dataset'], return_dataset=True)
+            # Remove description from config before passing to load_dataset_splits
+            dataset_config = {k: v for k, v in self.config['dataset'].items() if k != 'description'}
+            datasets, dataset = load_dataset_splits(**dataset_config, return_dataset=True)
             
             # Create data module
             dm = PerturbationDataModule(
@@ -153,7 +167,12 @@ class SimplifiedChemCPATrainer:
             print(f"- Number of drugs: {dataset_config['num_drugs']}")
             print(f"- Number of covariates: {dataset_config['num_covariates']}")
             print(f"- Training samples: {len(datasets['training'])}")
-            print(f"- Validation samples: {len(datasets['validation'])}")
+            
+            if 'validation' in datasets:
+                print(f"- Validation samples: {len(datasets['validation'])}")
+            else:
+                print("- Validation samples: Not available (using test set for validation)")
+            
             print(f"- Test samples: {len(datasets['test'])}")
             
             return dm, dataset_config, dataset
@@ -294,7 +313,7 @@ def main():
     parser = argparse.ArgumentParser(description='Train ChemCPA for stem cell drug perturbation prediction')
     
     # Dataset arguments
-    parser.add_argument('--dataset', type=str, choices=['sciplex', 'broad', 'lincs'], 
+    parser.add_argument('--dataset', type=str, choices=['sciplex', 'broad', 'lincs', 'biolord'], 
                        default='sciplex', help='Dataset to use for training')
     
     # Training arguments
@@ -343,4 +362,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
