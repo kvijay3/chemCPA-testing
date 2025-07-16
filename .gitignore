@@ -156,3 +156,5 @@ scripts/*.yaml
 embeddings_dir
 training_output
 training_output.zip
+
+project_folder/
